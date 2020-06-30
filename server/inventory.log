@@ -1,0 +1,13 @@
+{"Service":"inventory","level":"info","msg":"logger initialized","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"[GIN-debug] [WARNING] Running in \"debug\" mode. Switch to \"release\" mode in production.","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":" - using env:\texport GIN_MODE=release","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":" - using code:\tgin.SetMode(gin.ReleaseMode)","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"[GIN-debug] GET    /inventory/v1/health      --\u003e github.com/tattwei46/inventory/api.(*baseHandler).health-fm (3 handlers)","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"[GIN-debug] GET    /inventory/v1/version     --\u003e github.com/tattwei46/inventory/api.(*baseHandler).version-fm (3 handlers)","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"[GIN-debug] Listening and serving HTTP on 0.0.0.0:15888","time":"2020-06-30T10:19:27+08:00"}
+{"level":"info","msg":"[GIN] 2020/06/30 - 10:19:35 | 200 |      68.818µs |       127.0.0.1 | GET      \"/inventory/v1/version\"","time":"2020-06-30T10:19:35+08:00"}
+{"Service":"inventory","level":"debug","msg":"Health endpoint is called","time":"2020-06-30T10:19:40+08:00"}
+{"level":"info","msg":"[GIN] 2020/06/30 - 10:19:40 | 200 |       78.92µs |       127.0.0.1 | GET      \"/inventory/v1/health\"","time":"2020-06-30T10:19:40+08:00"}

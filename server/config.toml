@@ -1,10 +1,10 @@
-log-directory = "/Users/davidcheah/Desktop/DavidCheah/Golang/log"
+log-directory = "/Users/davidcheah/Desktop/DavidCheah/Golang/inventory/inventory/server"
 
 [services]
 	[inventory-service]
 		name = "inventory"
 		host = "0.0.0.0"
-		port = 15777
+		port = 15888
 		log-file-name = "inventory.log"
 [mongodb]
 	url = "mongodb://127.0.0.1:27017"

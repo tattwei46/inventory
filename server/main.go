@@ -8,37 +8,43 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tattwei46/inventory/framework"
-
-	"github.com/tattwei46/inventory/api"
+	"github.com/tattwei46/inventory/framework/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tattwei46/inventory/api"
+	"github.com/tattwei46/inventory/framework/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	framework.LoadConfigFile()
 
+	// 1. Load configuration from config.toml
+	config.Load()
+
+	// 2. Initialize mongodb
 	if mr, err := initMongo(); err != nil {
 		log.Fatal(err)
 	} else {
 		defer mr.Disconnect(context.TODO())
 	}
 
+	// 3. Get service info
 	service := getService()
-	framework.InitLogger(filepath.Join(framework.GetLogDir(), service.LogFileName), service.Name)
-	logger := framework.GetLoggerInstance()
+
+	// 4. Initialize logger
+	logger.InitLogger(filepath.Join(config.GetLogDir(), service.LogFileName), service.Name)
+	logger := logger.GetLoggerInstance()
 	logger.Info("logger initialized")
 	router := setupRouter()
 
-	if err := router.Run(fmt.Sprintf("%s:%s", service.Host, service.Port)); err != nil {
+	if err := router.Run(fmt.Sprintf("%s:%d", service.Host, service.Port)); err != nil {
 		logger.Error(err)
 	}
 }
 
-func getService() *framework.Service {
-	service := framework.GetServiceInfo(framework.INVENTORY)
+func getService() *config.Service {
+	service := config.GetServiceInfo(config.INVENTORY)
 	if len(service.Host) <= 0 {
 		service.Host = "0.0.0.0"
 		service.Port = 15701
@@ -49,7 +55,7 @@ func getService() *framework.Service {
 }
 
 func initMongo() (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI(framework.GetMongoDB(framework.MONGODB).URL)
+	clientOptions := options.Client().ApplyURI(config.GetMongoDB(config.MONGODB).URL)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -63,7 +69,7 @@ func initMongo() (*mongo.Client, error) {
 
 func setupRouter() *gin.Engine {
 	gin.DisableConsoleColor()
-	gin.DefaultWriter = io.MultiWriter(framework.GetLoggerInstance().Get(), os.Stdout)
+	gin.DefaultWriter = io.MultiWriter(logger.GetLoggerInstance().Get(), os.Stdout)
 
 	r := gin.Default()
 

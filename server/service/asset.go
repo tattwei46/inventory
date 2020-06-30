@@ -7,8 +7,9 @@ import (
 )
 
 type Asset interface {
-	Add(param.Asset) error
+	Add([]param.Asset) error
 	Get(param.Search, int, int) ([]param.Asset, error)
+	Delete(id string) (int64, error)
 }
 
 type asset struct {
@@ -36,7 +37,11 @@ func (s *asset) Get(search param.Search, limit, page int) ([]param.Asset, error)
 	return converter.Asset.ToParams(m), nil
 }
 
-func (s *asset) Add(request param.Asset) error {
-	m := converter.Asset.ToModel(request)
+func (s *asset) Add(requests []param.Asset) error {
+	m := converter.Asset.ToModels(requests)
 	return s.Asset.Add(m)
+}
+
+func (s *asset) Delete(id string) (int64, error) {
+	return s.Asset.Delete(id)
 }

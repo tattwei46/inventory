@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/tattwei46/inventory/server/types"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/tattwei46/inventory/server/param"
@@ -81,9 +83,16 @@ func setup() {
 func teardown() {
 }
 
+// Criteria 2.1 : Can Add if not exists
 func TestAsset_Add(t *testing.T) {
 	err := asset.Add(testParams)
 	assert.NoError(t, err)
+}
+
+// Criteria 2.2 : Cannot add if exist same serial number, brand and model
+func TestAsset_CannotAddIfExist(t *testing.T) {
+	err := asset.Add(testParams)
+	assert.Error(t, err)
 }
 
 func TestAsset_GetAll(t *testing.T) {
@@ -97,9 +106,10 @@ func TestAsset_GetAll(t *testing.T) {
 	}
 }
 
-func TestAsset_GetOne(t *testing.T) {
+// Criteria 1.1 : Can be filter by Serial Number
+func TestAsset_FilterBySerialNumber(t *testing.T) {
 	search := param.Search{
-		Brand: "Brand1",
+		SerialNumber: "SerialNumber1",
 	}
 	result, err := asset.Get(search, 0, 0)
 	assert.NoError(t, err)
@@ -111,6 +121,52 @@ func TestAsset_GetOne(t *testing.T) {
 	}
 }
 
+// Criteria 1.2 : Can be filter by Brand
+func TestAsset_FilterByBrand(t *testing.T) {
+	search := param.Search{
+		Brand: "Brand2",
+	}
+	result, err := asset.Get(search, 0, 0)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1, len(result))
+	for _, r := range result {
+		assert.Equal(t, testParams[1].Brand, r.Brand)
+		assert.Equal(t, testParams[1].Model, r.Model)
+		assert.Equal(t, testParams[1].SerialNumber, r.SerialNumber)
+	}
+}
+
+// Criteria 1.3 : Can be filter by Model
+func TestAsset_FilterByModel(t *testing.T) {
+	search := param.Search{
+		Model: "Model3",
+	}
+	result, err := asset.Get(search, 0, 0)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1, len(result))
+	for _, r := range result {
+		assert.Equal(t, testParams[2].Brand, r.Brand)
+		assert.Equal(t, testParams[2].Model, r.Model)
+		assert.Equal(t, testParams[2].SerialNumber, r.SerialNumber)
+	}
+}
+
+// Criteria 1.4 : Can be filter by Status
+func TestAsset_FilterByStatus(t *testing.T) {
+	search := param.Search{
+		Status: types.Available.String(),
+	}
+	result, err := asset.Get(search, 0, 0)
+	assert.NoError(t, err)
+	assert.EqualValues(t, len(testParams), len(result))
+	for i, r := range result {
+		assert.Equal(t, testParams[i].Brand, r.Brand)
+		assert.Equal(t, testParams[i].Model, r.Model)
+		assert.Equal(t, testParams[i].SerialNumber, r.SerialNumber)
+	}
+}
+
+// Criteria 3 : Can delete
 func TestAsset_Delete(t *testing.T) {
 	for _, id := range idList {
 		count, err := asset.Delete(id)

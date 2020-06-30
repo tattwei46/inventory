@@ -5,11 +5,13 @@ type Status int
 const (
 	Available    Status = 1
 	NotAvailable        = 2
+	Deleted             = 99
 )
 
 var statusMap = map[Status]string{
 	Available:    "Available",
 	NotAvailable: "Not Available",
+	Deleted:      "Deleted",
 }
 
 func (s Status) String() string {
@@ -26,6 +28,8 @@ func GetStatus(s string) Status {
 		return Available
 	case "Not Available":
 		return NotAvailable
+	case "Deleted":
+		return Deleted
 	default:
 		return 0
 	}

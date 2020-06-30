@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-const YYYYMMDD_hhmmssMST = "2006-01-02 15:04:05 MST"
+const YYYYMMDD_hhmmss = "2006-01-02 15:04:05"
 const TimeZone = "Asia/Singapore"
 
 func Format(unixSec int64, timeZone string, format string) string {
@@ -33,12 +33,12 @@ func (r Range) ToUnix() RangeUnix {
 
 	loc := Location(TimeZone, time.UTC)
 
-	from, err := time.ParseInLocation(YYYYMMDD_hhmmssMST, r.From, loc)
+	from, err := time.ParseInLocation(YYYYMMDD_hhmmss, r.From, loc)
 	if err != nil {
 		return RangeUnix{}
 	}
 
-	to, err := time.ParseInLocation(YYYYMMDD_hhmmssMST, r.To, loc)
+	to, err := time.ParseInLocation(YYYYMMDD_hhmmss, r.To, loc)
 	if err != nil {
 		return RangeUnix{}
 	}
@@ -55,5 +55,5 @@ type RangeUnix struct {
 }
 
 func (r RangeUnix) IsEmpty() bool {
-	return r == RangeUnix{}
+	return r.To == 0 && r.From == 0
 }

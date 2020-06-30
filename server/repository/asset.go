@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
+
+	"github.com/tattwei46/inventory/server/types"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -22,7 +23,9 @@ const (
 
 type Asset interface {
 	Get(search model.Search, limit, offset int) ([]model.Asset, error)
-	Add(model.Asset) error
+	Add([]model.Asset) error
+	Delete(id string) (int64, error)
+	Update(id string, update model.Asset) error
 }
 
 type asset struct {
@@ -54,11 +57,11 @@ func (r *asset) Get(search model.Search, limit, offset int) ([]model.Asset, erro
 		findOptions.SetSkip(int64((offset - 1) * limit))
 	}
 
-	// TODO : ADD FILTER
 	var filter = bson.D{}
 
 	if !search.Range.IsEmpty() {
 		filter = append(filter, bson.E{Key: "created", Value: bson.M{"$gte": search.Range.From}})
+		filter = append(filter, bson.E{Key: "created", Value: bson.M{"$lte": search.Range.To}})
 	}
 
 	if search.Status > 0 {
@@ -92,23 +95,106 @@ func (r *asset) Get(search model.Search, limit, offset int) ([]model.Asset, erro
 		result = append(result, asset)
 	}
 
-	fmt.Println(result)
-
-	fmt.Println(filter)
-
 	return result, nil
 }
 
 // TODO : CHANGE TO ADD MANY
-func (r *asset) Add(request model.Asset) error {
-	result, err := r.coll.InsertOne(context.TODO(), request)
+func (r *asset) Add(requests []model.Asset) error {
+
+	// Find if items are duplicated
+	for _, req := range requests {
+		search := model.Search{
+			Brand:        req.Brand,
+			SerialNumber: req.SerialNumber,
+			Model:        req.Model,
+		}
+
+		found, err := r.Get(search, 0, 0)
+		if err != nil {
+			return err
+		}
+
+		if len(found) > 0 {
+			return types.DuplicatedItem
+		}
+
+		result, err := r.coll.InsertOne(context.TODO(), req)
+		if err != nil {
+			return err
+		}
+
+		if _, ok := result.InsertedID.(primitive.ObjectID); !ok {
+			return errors.New("failed to get oid")
+		}
+	}
+
+	return nil
+}
+
+func (r *asset) Delete(id string) (int64, error) {
+
+	if len(id) <= 0 {
+		return 0, nil
+	}
+
+	f := bson.D{
+		{"id", id},
+	}
+
+	res, err := r.coll.DeleteOne(context.TODO(), f)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.DeletedCount, nil
+}
+
+func (r *asset) Update(id string, update model.Asset) error {
+	// Search if item exists in db
+	search := model.Search{
+		ID: id,
+	}
+	found, err := r.Get(search, 0, 0)
+	if err != nil {
+		return err
+	}
+	if len(found) <= 0 {
+		return types.NoItem
+	}
+
+	filter := bson.D{{"id", id}}
+	var condition bson.D
+
+	if update.Created > 0 {
+		condition = append(condition, bson.E{Key: "created", Value: update.Created})
+	}
+
+	if len(update.Brand) > 0 {
+		condition = append(condition, bson.E{Key: "brand", Value: update.Brand})
+	}
+
+	if len(update.Model) > 0 {
+		condition = append(condition, bson.E{Key: "model", Value: update.Model})
+	}
+
+	if len(update.SerialNumber) > 0 {
+		condition = append(condition, bson.E{Key: "serial_number", Value: update.SerialNumber})
+	}
+
+	if update.Status > 0 {
+		condition = append(condition, bson.E{Key: "status", Value: update.Status})
+	}
+
+	updateCond := bson.D{
+		{"$set", condition},
+	}
+
+	_, err = r.coll.UpdateOne(context.TODO(), filter, updateCond)
+
 	if err != nil {
 		return err
 	}
 
-	if _, ok := result.InsertedID.(primitive.ObjectID); !ok {
-		return errors.New("failed to get oid")
-	}
-
 	return nil
+
 }

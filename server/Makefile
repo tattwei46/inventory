@@ -10,7 +10,7 @@ CURR_DIR := $(shell pwd)
 all: build
 
 build: ## Build the binary file
-	@go build -mod=vendor -ldflags="-X 'github.com/tattwei46/inventory/server/api.BuildTime=$(TIMESTAMP)' -X 'github.com/tattwei46/inventory/server/api.BuildVersion=$(GIT_COMMIT)'" -o $(CURR_DIR)/bin/$(PROJECT_NAME).o
+	@go build -ldflags="-X 'github.com/tattwei46/inventory/server/api.BuildTime=$(TIMESTAMP)' -X 'github.com/tattwei46/inventory/server/api.BuildVersion=$(GIT_COMMIT)'" -o $(CURR_DIR)/bin/$(PROJECT_NAME).o
 
 run: ## Build the binary file
 	@go build -o $(CURR_DIR)/bin/$(PROJECT_NAME).o

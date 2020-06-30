@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,7 @@ func newAssetHandler() (*assetHandler, error) {
 	return &assetHandler{service, logger.GetInstance()}, nil
 }
 
-func (h *assetHandler) get(c *gin.Context) {
+func (h *assetHandler) search(c *gin.Context) {
 	var limit int
 	var page int
 
@@ -56,18 +57,64 @@ func (h *assetHandler) get(c *gin.Context) {
 }
 
 func (h *assetHandler) add(c *gin.Context) {
-	var request param.Asset
+	var requests []param.Asset
 
-	if err := c.BindJSON(&request); err != nil {
+	if err := c.BindJSON(&requests); err != nil {
 		c.JSON(http.StatusBadRequest, types.Response.NewError(types.BadRequest))
 		return
 	}
 
-	if err := h.Asset.Add(request); err != nil {
+	err := h.Asset.Add(requests)
+
+	if err == types.DuplicatedItem {
+		c.JSON(http.StatusBadRequest, types.Response.NewError(err))
+		return
+	}
+
+	if err != nil {
 		h.log.Error(err)
 		c.JSON(http.StatusInternalServerError, types.Response.NewError(err))
 		return
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func (h *assetHandler) get(c *gin.Context) {
+	res, err := h.Asset.Get(param.Search{}, 0, 0)
+	if err != nil {
+		h.log.Error(err)
+		c.JSON(http.StatusInternalServerError, types.Response.NewError(err))
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *assetHandler) delete(c *gin.Context) {
+	id := c.Param("id")
+	count, err := h.Asset.Delete(id)
+	if err != nil {
+		h.log.Error(err)
+		c.JSON(http.StatusInternalServerError, types.Response.NewError(err))
+		return
+	}
+	c.JSON(http.StatusOK, types.Response.NewSuccess(fmt.Sprintf("Deleted %d", count)))
+}
+
+func (h *assetHandler) update(c *gin.Context) {
+	id := c.Param("id")
+
+	var update param.Asset
+	if err := c.BindJSON(&update); err != nil {
+		c.JSON(http.StatusBadRequest, types.Response.NewError(types.BadRequest))
+		return
+	}
+
+	err := h.Asset.Update(id, update)
+	if err != nil {
+		h.log.Error(err)
+		c.JSON(http.StatusInternalServerError, types.Response.NewError(err))
+		return
+	}
+	c.JSON(http.StatusOK, types.Response.NewSuccess("updated"))
 }

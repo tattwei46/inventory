@@ -3,7 +3,7 @@ package api
 import (
 	"path/filepath"
 
-	"github.com/tattwei46/inventory/framework/logger"
+	"github.com/tattwei46/inventory/server/framework/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +15,7 @@ func route(router *gin.Engine, url string) *gin.RouterGroup {
 }
 
 func Base() base {
-	return base{url: "", log: logger.GetLoggerInstance()}
+	return base{url: "", log: logger.GetInstance()}
 }
 
 type base struct {

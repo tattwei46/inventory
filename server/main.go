@@ -8,13 +8,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/tattwei46/inventory/framework/logger"
+	"github.com/tattwei46/inventory/server/framework/db"
+
+	"github.com/tattwei46/inventory/server/framework/logger"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tattwei46/inventory/api"
-	"github.com/tattwei46/inventory/framework/config"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/tattwei46/inventory/server/api"
+	"github.com/tattwei46/inventory/server/framework/config"
 )
 
 func main() {
@@ -23,10 +23,10 @@ func main() {
 	config.Load()
 
 	// 2. Initialize mongodb
-	if mr, err := initMongo(); err != nil {
+	if mr, err := db.NewMongoDB(); err != nil {
 		log.Fatal(err)
 	} else {
-		defer mr.Disconnect(context.TODO())
+		defer mr.Client.Disconnect(context.TODO())
 	}
 
 	// 3. Get service info
@@ -34,7 +34,7 @@ func main() {
 
 	// 4. Initialize logger
 	logger.InitLogger(filepath.Join(config.GetLogDir(), service.LogFileName), service.Name)
-	logger := logger.GetLoggerInstance()
+	logger := logger.GetInstance()
 	logger.Info("logger initialized")
 	router := setupRouter()
 
@@ -54,25 +54,16 @@ func getService() *config.Service {
 	return service
 }
 
-func initMongo() (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI(config.GetMongoDB(config.MONGODB).URL)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err = client.Ping(context.TODO(), nil); err != nil {
-		return client, err
-	}
-	fmt.Println("Connected to MongoDB!")
-	return client, nil
-}
-
 func setupRouter() *gin.Engine {
 	gin.DisableConsoleColor()
-	gin.DefaultWriter = io.MultiWriter(logger.GetLoggerInstance().Get(), os.Stdout)
+
+	// output gin log into file and console
+	gin.DefaultWriter = io.MultiWriter(logger.GetInstance().Get(), os.Stdout)
 
 	r := gin.Default()
 
 	api.Base().Routes(r)
+
+	api.Asset().Routes(r)
 	return r
 }

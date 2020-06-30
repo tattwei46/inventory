@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/tattwei46/inventory/framework/logger"
+	"github.com/tattwei46/inventory/server/framework/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,7 @@ type baseHandler struct {
 }
 
 func newBaseHandler() (*baseHandler, error) {
-	return &baseHandler{log: logger.GetLoggerInstance()}, nil
+	return &baseHandler{log: logger.GetInstance()}, nil
 }
 
 func (h *baseHandler) health(c *gin.Context) {

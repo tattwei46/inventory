@@ -59,6 +59,6 @@ func (l *Logger) Get() io.Writer {
 	return l.log.Writer()
 }
 
-func GetLoggerInstance() *Logger {
+func GetInstance() *Logger {
 	return logger
 }

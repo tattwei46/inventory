@@ -19,3 +19,14 @@ func (s Status) String() string {
 
 	return ""
 }
+
+func GetStatus(s string) Status {
+	switch s {
+	case "Available":
+		return Available
+	case "Not Available":
+		return NotAvailable
+	default:
+		return 0
+	}
+}

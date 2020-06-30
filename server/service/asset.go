@@ -8,7 +8,7 @@ import (
 
 type Asset interface {
 	Add(param.Asset) error
-	Get(limit, page int) ([]param.Asset, error)
+	Get(param.Search, int, int) ([]param.Asset, error)
 }
 
 type asset struct {
@@ -24,10 +24,11 @@ func NewAsset() (Asset, error) {
 	return &asset{repo}, nil
 }
 
-func (s *asset) Get(limit, page int) ([]param.Asset, error) {
+func (s *asset) Get(search param.Search, limit, page int) ([]param.Asset, error) {
 	var result = make([]param.Asset, 0)
 
-	m, err := s.Asset.Get(limit, page)
+	filter := converter.Search.ToModel(search)
+	m, err := s.Asset.Get(filter, limit, page)
 	if err != nil {
 		return result, err
 	}

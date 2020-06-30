@@ -22,6 +22,6 @@ func (h asset) Routes(router *gin.Engine) {
 	}
 	r := route(router, h.url)
 
-	r.GET("/", handler.get)
+	r.POST("/action/search", handler.get)
 	r.POST("/", handler.add)
 }

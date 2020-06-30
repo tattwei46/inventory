@@ -17,6 +17,7 @@ func (asset) ToModel(request param.Asset) model.Asset {
 		ID:           request.ID,
 		SerialNumber: request.SerialNumber,
 		Model:        request.Model,
+		Brand:        request.Brand,
 		Status:       types.Available,
 		Created:      time.Now().Unix(),
 	}
@@ -27,6 +28,7 @@ func (asset) ToParam(request *model.Asset) param.Asset {
 		ID:           request.ID,
 		SerialNumber: request.SerialNumber,
 		Model:        request.Model,
+		Brand:        request.Brand,
 		Status:       request.Status.String(),
 		Created:      types.Format(request.Created, types.TimeZone, types.YYYYMMDD_hhmmssMST),
 	}

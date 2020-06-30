@@ -29,7 +29,6 @@ func newAssetHandler() (*assetHandler, error) {
 }
 
 func (h *assetHandler) get(c *gin.Context) {
-
 	var limit int
 	var page int
 
@@ -40,7 +39,14 @@ func (h *assetHandler) get(c *gin.Context) {
 		page = val
 	}
 
-	res, err := h.Asset.Get(limit, page)
+	var search param.Search
+
+	if err := c.BindJSON(&search); err != nil {
+		c.JSON(http.StatusBadRequest, types.Response.NewError(types.BadRequest))
+		return
+	}
+
+	res, err := h.Asset.Get(search, limit, page)
 	if err != nil {
 		h.log.Error(err)
 		c.JSON(http.StatusInternalServerError, types.Response.NewError(err))

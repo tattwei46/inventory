@@ -49,7 +49,6 @@ var testParams = []param.Asset{
 func TestMain(m *testing.M) {
 	setup()
 	code := m.Run()
-	teardown()
 	os.Exit(code)
 }
 
@@ -164,6 +163,170 @@ func TestAsset_FilterByStatus(t *testing.T) {
 		assert.Equal(t, testParams[i].Model, r.Model)
 		assert.Equal(t, testParams[i].SerialNumber, r.SerialNumber)
 	}
+}
+
+// Criteria 3.1: Can update brand
+func TestAsset_UpdateBrand(t *testing.T) {
+
+	// Get existing ID
+	search := param.Search{
+		SerialNumber: testParams[1].SerialNumber, // SerialNumber1,
+	}
+	result, _ := asset.Get(search, 1, 1)
+
+	id := result[0].ID
+
+	// Update existing ID
+	update := param.Asset{
+		Brand: "BrandNew2",
+	}
+
+	err := asset.Update(id, update)
+	assert.NoError(t, err)
+
+	// Get updated item
+	result, _ = asset.Get(search, 1, 1)
+	assert.Equal(t, update.Brand, result[0].Brand)
+
+	// Update existing ID
+	update = param.Asset{
+		Brand: testParams[1].Brand,
+	}
+
+	asset.Update(id, update)
+
+}
+
+// Criteria 3.2: Can update model
+func TestAsset_UpdateModel(t *testing.T) {
+
+	// Get existing ID
+	search := param.Search{
+		SerialNumber: testParams[1].SerialNumber, // SerialNumber1,
+	}
+	result, _ := asset.Get(search, 1, 1)
+
+	id := result[0].ID
+
+	// Update existing ID
+	update := param.Asset{
+		Model: "ModelNew2",
+	}
+
+	err := asset.Update(id, update)
+	assert.NoError(t, err)
+
+	// Get updated item
+	result, _ = asset.Get(search, 1, 1)
+	assert.Equal(t, update.Model, result[0].Model)
+
+	// Update existing ID
+	update = param.Asset{
+		Model: testParams[1].Model,
+	}
+
+	asset.Update(id, update)
+
+}
+
+// Criteria 3.3: Can update serial number
+func TestAsset_UpdateSerialNumber(t *testing.T) {
+
+	// Get existing ID
+	search := param.Search{
+		SerialNumber: testParams[1].SerialNumber, // SerialNumber2,
+	}
+	result, _ := asset.Get(search, 1, 1)
+
+	id := result[0].ID
+
+	// Update existing ID
+	update := param.Asset{
+		SerialNumber: "SerialNumberNew2",
+	}
+
+	err := asset.Update(id, update)
+	assert.NoError(t, err)
+
+	search = param.Search{
+		SerialNumber: update.SerialNumber, // SerialNumber2,
+	}
+	// Get updated item
+	result, _ = asset.Get(search, 1, 1)
+	assert.Equal(t, update.SerialNumber, result[0].SerialNumber)
+
+	// Update existing ID
+	update = param.Asset{
+		SerialNumber: testParams[1].SerialNumber,
+	}
+
+	asset.Update(id, update)
+
+}
+
+// Criteria 3.4: Can update status
+func TestAsset_UpdateStatus(t *testing.T) {
+
+	// Get existing ID
+	search := param.Search{
+		SerialNumber: testParams[1].SerialNumber, // SerialNumber1,
+	}
+	result, _ := asset.Get(search, 1, 1)
+
+	id := result[0].ID
+
+	// Update existing ID
+	update := param.Asset{
+		Status: types.NotAvailable.String(),
+	}
+
+	err := asset.Update(id, update)
+	assert.NoError(t, err)
+
+	// Get updated item
+	result, _ = asset.Get(search, 1, 1)
+	assert.Equal(t, update.Status, result[0].Status)
+
+	// Update existing ID
+	update = param.Asset{
+		Status: testParams[1].Status,
+	}
+
+	asset.Update(id, update)
+
+}
+
+// Criteria 3.5: Can update date bought
+func TestAsset_UpdateDateBought(t *testing.T) {
+
+	// Get existing ID
+	search := param.Search{
+		SerialNumber: testParams[1].SerialNumber, // SerialNumber1,
+	}
+	result, _ := asset.Get(search, 1, 1)
+
+	id := result[0].ID
+	created := result[0].Created
+
+	// Update existing ID
+	update := param.Asset{
+		Created: "2020-07-01 00:00:00",
+	}
+
+	err := asset.Update(id, update)
+	assert.NoError(t, err)
+
+	// Get updated item
+	result, _ = asset.Get(search, 1, 1)
+	assert.Equal(t, update.Created, result[0].Created)
+
+	// Update existing ID
+	update = param.Asset{
+		Created: created,
+	}
+
+	asset.Update(id, update)
+
 }
 
 // Criteria 3 : Can delete

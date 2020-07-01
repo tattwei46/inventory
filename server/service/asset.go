@@ -1,9 +1,12 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/tattwei46/inventory/server/param"
 	"github.com/tattwei46/inventory/server/repository"
 	"github.com/tattwei46/inventory/server/service/converter"
+	"github.com/tattwei46/inventory/server/types"
 )
 
 type Asset interface {
@@ -48,6 +51,27 @@ func (s *asset) Delete(id string) (int64, error) {
 }
 
 func (s *asset) Update(id string, update param.Asset) error {
-	toUpdate := converter.Asset.ToModel(&update)
+	toUpdate := converter.Update.ToModel(&update)
+
+	search := param.Search{
+		Range: types.Range{
+			From: update.Created,
+			To:   update.Created,
+		},
+		SerialNumber: update.SerialNumber,
+		Brand:        update.Brand,
+		Model:        update.Model,
+		Status:       update.Status,
+	}
+
+	res, err := s.Get(search, 1, 1)
+	if err != nil {
+		return fmt.Errorf("an error occured when check item exist before update %v", err)
+	}
+
+	if len(res) > 0 {
+		return types.DuplicatedItem
+	}
+
 	return s.Asset.Update(id, toUpdate)
 }

@@ -101,11 +101,11 @@ func teardown() {
 }
 
 func TestAsset_Add(t *testing.T) {
-	var request = make([]model.Asset, 0)
-	request = append(request, testModels...)
 
-	err := mgoAsset.Add(request)
-	assert.NoError(t, err)
+	for _, r := range testModels {
+		err := mgoAsset.Add(r)
+		assert.NoError(t, err)
+	}
 }
 
 func TestAsset_GetAll(t *testing.T) {

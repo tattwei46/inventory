@@ -53,11 +53,16 @@ func (h *assetHandler) search(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, types.Response.NewError(err))
 		return
 	}
+
+	if len(res) <= 0 {
+		c.Status(http.StatusNoContent)
+		return
+	}
 	c.JSON(http.StatusOK, res)
 }
 
 func (h *assetHandler) add(c *gin.Context) {
-	var requests []param.Asset
+	var requests param.Asset
 
 	if err := c.BindJSON(&requests); err != nil {
 		c.JSON(http.StatusBadRequest, types.Response.NewError(types.BadRequest))

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-const YYYYMMDD_hhmmss = "2006-01-02 15:04:05"
+const YYYYMMDD_hhmmss = "2006-01-02"
 const TimeZone = "Asia/Singapore"
 
 func Format(unixSec int64, timeZone string, format string) string {

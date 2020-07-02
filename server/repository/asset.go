@@ -23,7 +23,7 @@ const (
 
 type Asset interface {
 	Get(search model.Search, limit, offset int) ([]model.Asset, error)
-	Add([]model.Asset) error
+	Add(model.Asset) error
 	Delete(id string) (int64, error)
 	Update(id string, update model.Asset) error
 }
@@ -99,35 +99,31 @@ func (r *asset) Get(search model.Search, limit, offset int) ([]model.Asset, erro
 }
 
 // TODO : CHANGE TO ADD MANY
-func (r *asset) Add(requests []model.Asset) error {
-
-	// Find if items are duplicated
-	for _, req := range requests {
-		search := model.Search{
-			Brand:        req.Brand,
-			SerialNumber: req.SerialNumber,
-			Model:        req.Model,
-		}
-
-		found, err := r.Get(search, 0, 0)
-		if err != nil {
-			return err
-		}
-
-		if len(found) > 0 {
-			return types.DuplicatedItem
-		}
-
-		result, err := r.coll.InsertOne(context.TODO(), req)
-		if err != nil {
-			return err
-		}
-
-		if _, ok := result.InsertedID.(primitive.ObjectID); !ok {
-			return errors.New("failed to get oid")
-		}
+func (r *asset) Add(req model.Asset) error {
+	// Find if item is duplicated
+	search := model.Search{
+		Brand:        req.Brand,
+		SerialNumber: req.SerialNumber,
+		Model:        req.Model,
 	}
 
+	found, err := r.Get(search, 0, 0)
+	if err != nil {
+		return err
+	}
+
+	if len(found) > 0 {
+		return types.DuplicatedItem
+	}
+
+	result, err := r.coll.InsertOne(context.TODO(), req)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := result.InsertedID.(primitive.ObjectID); !ok {
+		return errors.New("failed to get oid")
+	}
 	return nil
 }
 

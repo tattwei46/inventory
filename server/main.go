@@ -63,7 +63,7 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 
 	api.Base().Routes(r)
-
+	api.Session().Routes(r)
 	api.Asset().Routes(r)
 	return r
 }

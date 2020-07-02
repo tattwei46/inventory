@@ -84,14 +84,18 @@ func teardown() {
 
 // Criteria 2.1 : Can Add if not exists
 func TestAsset_Add(t *testing.T) {
-	err := asset.Add(testParams)
-	assert.NoError(t, err)
+	for _, r := range testParams {
+		err := asset.Add(r)
+		assert.NoError(t, err)
+	}
 }
 
 // Criteria 2.2 : Cannot add if exist same serial number, brand and model
 func TestAsset_CannotAddIfExist(t *testing.T) {
-	err := asset.Add(testParams)
-	assert.Error(t, err)
+	for _, r := range testParams {
+		err := asset.Add(r)
+		assert.Error(t, err)
+	}
 }
 
 func TestAsset_GetAll(t *testing.T) {
@@ -330,10 +334,10 @@ func TestAsset_UpdateDateBought(t *testing.T) {
 }
 
 // Criteria 3 : Can delete
-func TestAsset_Delete(t *testing.T) {
-	for _, id := range idList {
-		count, err := asset.Delete(id)
-		assert.NoError(t, err)
-		assert.EqualValues(t, 1, count)
-	}
-}
+//func TestAsset_Delete(t *testing.T) {
+//	for _, id := range idList {
+//		count, err := asset.Delete(id)
+//		assert.NoError(t, err)
+//		assert.EqualValues(t, 1, count)
+//	}
+//}

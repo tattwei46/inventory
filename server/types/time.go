@@ -49,6 +49,18 @@ func (r Range) ToUnix() RangeUnix {
 	}
 }
 
+func ToUnix(created string) int64 {
+
+	loc := Location(TimeZone, time.UTC)
+
+	c, err := time.ParseInLocation(YYYYMMDD_hhmmss, created, loc)
+	if err != nil {
+		return 0
+	}
+
+	return c.Unix()
+}
+
 type RangeUnix struct {
 	From int64
 	To   int64

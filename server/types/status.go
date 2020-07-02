@@ -4,8 +4,8 @@ type Status int
 
 const (
 	Available    Status = 1
-	NotAvailable        = 2
-	Deleted             = 99
+	NotAvailable Status = 2
+	Deleted      Status = 99
 )
 
 var statusMap = map[Status]string{

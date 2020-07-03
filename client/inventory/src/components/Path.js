@@ -1,5 +1,5 @@
 const Login = "/";
-const Inventory = "/inventory";
+const Inventory = "/inventory-ui";
 
 const Path = {
   Login,

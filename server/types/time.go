@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -38,10 +39,15 @@ func (r Range) ToUnix() RangeUnix {
 		return RangeUnix{}
 	}
 
-	to, err := time.ParseInLocation(YYYYMMDD_hhmmss, r.To, loc)
+	tempTo, err := time.ParseInLocation(YYYYMMDD_hhmmss, r.To, loc)
 	if err != nil {
 		return RangeUnix{}
 	}
+
+	fmt.Println(tempTo)
+	// Front end is sending range from 2020/1/1 to 2020/1/2 so we need to include 2020/1/2 as well
+	to := tempTo.Add(24 * time.Hour)
+	fmt.Println(to)
 
 	return RangeUnix{
 		From: from.Unix(),

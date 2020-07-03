@@ -61,7 +61,7 @@ func (r *asset) Get(search model.Search, limit, offset int) ([]model.Asset, erro
 
 	if !search.Range.IsEmpty() {
 		filter = append(filter, bson.E{Key: "created", Value: bson.M{"$gte": search.Range.From}})
-		filter = append(filter, bson.E{Key: "created", Value: bson.M{"$lte": search.Range.To}})
+		filter = append(filter, bson.E{Key: "created", Value: bson.M{"$lt": search.Range.To}})
 	}
 
 	if search.Status > 0 {
@@ -98,7 +98,6 @@ func (r *asset) Get(search model.Search, limit, offset int) ([]model.Asset, erro
 	return result, nil
 }
 
-// TODO : CHANGE TO ADD MANY
 func (r *asset) Add(req model.Asset) error {
 	// Find if item is duplicated
 	search := model.Search{

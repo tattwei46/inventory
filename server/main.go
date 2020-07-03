@@ -32,8 +32,10 @@ func main() {
 	// 3. Get service info
 	service := getService()
 
+	pwd, _ := os.Getwd()
+
 	// 4. Initialize logger
-	logger.InitLogger(filepath.Join(config.GetLogDir(), service.LogFileName), service.Name)
+	logger.InitLogger(filepath.Join(pwd, service.LogFileName), service.Name)
 	logger := logger.GetInstance()
 	logger.Info("logger initialized")
 	router := setupRouter()

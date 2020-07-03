@@ -1,32 +1,32 @@
 package api
 
 import (
-	"fmt"
+	"path/filepath"
 
-	"github.com/tattwei46/inventory/framework"
+	"github.com/tattwei46/inventory/server/framework/logger"
 
 	"github.com/gin-gonic/gin"
 )
 
-const contextRoot = "interface/v1"
+const contextRoot = "inventory/v1"
 
 func route(router *gin.Engine, url string) *gin.RouterGroup {
-	return router.Group(fmt.Sprintf("%s/%v", contextRoot, url))
+	return router.Group(filepath.Join(contextRoot, url))
 }
 
 func Base() base {
-	return base{url: "", log: framework.GetLoggerInstance()}
+	return base{url: "", log: logger.GetInstance()}
 }
 
 type base struct {
 	url string
-	log *framework.Logger
+	log *logger.Logger
 }
 
 func (h base) Routes(router *gin.Engine) {
 	handler, err := newBaseHandler()
 	if err != nil {
-		h.log.Error("An Error Occurred while Creating  Base Handler")
+		h.log.Error("An Error Occurred while Creating Base Handler")
 	}
 	r := route(router, h.url)
 

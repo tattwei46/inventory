@@ -1,0 +1,8 @@
+logs/
+.settings/
+.metadata
+.project
+*.o
+../.idea
+.DS_Store
+bin/
